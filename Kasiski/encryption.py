@@ -1,10 +1,6 @@
-import argparse
+from argparse import ArgumentParser
 
-def encryption(text, keyword):
-	ciphertext = text
-	# Перепишем исходный текст в верхнем регистре: 
-	text = text.upper()
-	print('Plaintext: ', text, sep='\n')	
+def encryption(text, keyword):	
 	textlen = len(text) # длина исходного текста
 
 	# Перепишем ключевое слово в верхний регистр:
@@ -24,28 +20,44 @@ def encryption(text, keyword):
 		else:
 			ciphertext += m
 
+	with open('myciphertext.txt', 'w') as f:
+		f.write(ciphertext)
+
 	return ciphertext
 
 
 def parse_args():
-	parser = argparse.ArgumentParser()
+	parser = ArgumentParser()
 	parser.add_argument('--textfile', '-t',
 						default='myplaintext.txt',
 						help='file with plaintext you want to encrypt')
 	parser.add_argument('--key', '-k',
 						default='krya',
 						help='encryption key')
+	parser.add_argument('--quiet', '-q',
+						default=False,
+						help='display the text on command line or not (False for display)')
 	return parser.parse_args()
 
 
 if __name__ == '__main__':
 	args = parse_args()
-	with open(args.textfile, 'r') as f:
-		plaintext = f.readline()	
 	
-	ciphertext = encryption(text=plaintext, keyword=args.key)
-
-	print('Ciphertext:', ciphertext, sep='\n')
+	if args.quiet.lower() == 'true' or args.quiet == '1':
+		quiet = True
+	elif args.quiet.lower() == 'false' or args.quiet == '0':
+		quiet = False
+	else:
+		quiet = False
 	
-	
-	
+	try:
+		with open(args.textfile, 'r') as f:
+			plaintext = f.read()	
+	except IOError as e:
+		print("File {} do not exists.".format(args.textfile))
+	else: 
+		plaintext = plaintext.upper()
+		ciphertext = encryption(text=plaintext, keyword=args.key)
+		if not quiet:
+			print('Plaintext: ', plaintext, sep='\n')
+			print('Ciphertext:', ciphertext, sep='\n')
