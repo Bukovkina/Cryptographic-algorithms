@@ -43,9 +43,9 @@ def parse_args():
 if __name__ == '__main__':
 	args = parse_args()
 	
-	if args.quiet.lower() == 'true' or args.quiet == '1':
+	if args.quiet == 'True' or args.quiet == '1':
 		quiet = True
-	elif args.quiet.lower() == 'false' or args.quiet == '0':
+	elif args.quiet == 'False' or args.quiet == '0':
 		quiet = False
 	else:
 		quiet = False
