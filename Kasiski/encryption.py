@@ -29,7 +29,7 @@ def encryption(text, keyword):
 
 def parse_args():
 	parser = ArgumentParser()
-	parser.add_argument('--textfile', '-t',
+	parser.add_argument('--file', '-f',
 						default='myplaintext.txt',
 						help='file with plaintext you want to encrypt')
 	parser.add_argument('--key', '-k',
@@ -45,10 +45,10 @@ if __name__ == '__main__':
 	args = parse_args()
 	
 	try:
-		with open(args.textfile, 'r') as f:
+		with open(args.file, 'r') as f:
 			plaintext = f.read()	
 	except IOError as e:
-		print("File {} do not exists.".format(args.textfile))
+		print("File {} do not exists.".format(args.file))
 	else: 
 		plaintext = plaintext.upper()
 		ciphertext = encryption(text=plaintext, keyword=args.key)

@@ -118,7 +118,7 @@ def shift(x):
 
 def parse_args():
 	parser = ArgumentParser()
-	parser.add_argument('--textfile', '-t',
+	parser.add_argument('--file', '-f',
 						default='myciphertext.txt',
 						help='file with ciphertext you want to decrypt')
 	parser.add_argument('--quiet', '-q',
@@ -132,10 +132,10 @@ if __name__ == '__main__':
 	args = parse_args()
 	
 	try:
-		with open(args.textfile, 'r') as f:
+		with open(args.file, 'r') as f:
 			ciphertext = f.read()	
 	except IOError as e:
-		print("File {} do not exists.".format(args.textfile))
+		print("File {} do not exists.".format(args.file))
 	else: 
 		ciphertext = ciphertext.upper()
 		foundtext = decryption(text=ciphertext)
