@@ -2,8 +2,8 @@ from argparse import ArgumentParser
 from math import gcd
 from collections import Counter
 
-#import matplotlib.pyplot as plt
 import numpy as np
+
 
 def decryption(text):	
 	textlen = len(text) # длина исходного текста
@@ -123,19 +123,13 @@ def parse_args():
 						help='file with ciphertext you want to decrypt')
 	parser.add_argument('--quiet', '-q',
 						default=False,
-						help='display the text on command line or not (False for display)')
+						help='do not display the text on command line',
+						action='store_true')
 	return parser.parse_args()
 
 
 if __name__ == '__main__':
 	args = parse_args()
-	
-	if args.quiet == 'True' or args.quiet == '1':
-		quiet = True
-	elif args.quiet == 'False' or args.quiet == '0':
-		quiet = False
-	else:
-		quiet = False
 	
 	try:
 		with open(args.textfile, 'r') as f:
@@ -145,6 +139,6 @@ if __name__ == '__main__':
 	else: 
 		ciphertext = ciphertext.upper()
 		foundtext = decryption(text=ciphertext)
-		if not quiet:
+		if not args.quiet:
 			print('Ciphertext:', ciphertext, sep='\n')
 			print('Foundtext: ', foundtext, sep='\n')

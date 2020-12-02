@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 
+
 def encryption(text, keyword):	
 	textlen = len(text) # длина исходного текста
 
@@ -35,20 +36,13 @@ def parse_args():
 						default='krya',
 						help='encryption key')
 	parser.add_argument('--quiet', '-q',
-						default=False,
-						help='display the text on command line or not (False for display)')
+						help='do not display the text on command line',
+						action='store_true')
 	return parser.parse_args()
 
 
 if __name__ == '__main__':
 	args = parse_args()
-	
-	if args.quiet == 'True' or args.quiet == '1':
-		quiet = True
-	elif args.quiet == 'False' or args.quiet == '0':
-		quiet = False
-	else:
-		quiet = False
 	
 	try:
 		with open(args.textfile, 'r') as f:
@@ -58,6 +52,6 @@ if __name__ == '__main__':
 	else: 
 		plaintext = plaintext.upper()
 		ciphertext = encryption(text=plaintext, keyword=args.key)
-		if not quiet:
-			print('Plaintext: ', plaintext, sep='\n')
+		if not args.quiet:
+			print('Plaintext:', plaintext, sep='\n')
 			print('Ciphertext:', ciphertext, sep='\n')
