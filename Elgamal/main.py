@@ -1,62 +1,75 @@
-from argparse import ArgumentParser
+import random
 
 import numpy as np
 
 
-def mypow(r, a, p):
-	res = 1
-	for i in range(a):
-		res = res * r % p
-	return res
-
-
 def keygen(p, g):
-	# Каждый абонент выбирает свое секретное число ci, 1 < ci < p-1:
-	c = np.array([np.random.randint(1, p-1) for i in range(3)])
-
-	# По секретным ключам вычисляются открытые ключи di:
-	d = [mypow(g, ci, p) for ci in c]
-
-	return c, d
-  
-
-def table(c, d):
-	# Получаем такую табличку абонентов:
-	print('Абонент  Закр.ключ Откр.ключ')
-	for i in range(c.size):
-		print('  ', i, '      ', c[i], '      ', d[i])
-	print()
+	# Генерируется закрытый ключ x, 1 < x < p-1:
+	x = random.randint(2, p-2)
+	# По секретному ключу вычисляется открытый ключ y:
+	y = pow(g, x, p)
+	return x, y
 
 
-def encryption(p, g, m, d):
-	# Генерируем случайное число k:
-	k = np.random.randint(1, p-2)
-	print('k =', k)
-
+def encryption(p, g, m, y):
+	# Генерируем случайное число k, 1 < k < p-1:
+	k = random.randint(2, p-2)
+	print(f'k = {k}')
 	# Вычисляем пару (r, e):
-	r = mypow(g, k, p)
-	e = m * mypow(int(d), k, p) % p
-
+	r = pow(g, k, p)
+	e = m * pow(int(y), k, p) % p
 	return r, e
 
 
-def decryption(r, e, p, c):
-	m = e * mypow(r, (p-1-c), p) % p
+def decryption(r, e, p, x):
+	m = e * pow(r, (p-1-x), p) % p
 	return m
 
 
+def gen_pg(m):
+	with open('prime_numbers.txt', 'r') as f:
+		str_prime = f.read()
+		prime_numbers = np.array([int(i) for i in str_prime.split(',')])
+	# p - простое число : p > m
+	p = int(random.choice(prime_numbers[prime_numbers > m]))
+	# g - случайное число : g < p, g - первообразный корень p
+	g = random.randint(1, p-1)
+	while not is_primitive_root(g, p):
+		g = random.randint(1, p-1)
+	print(f'p = {p}, g = {g}')
+	return p, g
+
+
+def is_primitive_root(g, p):
+	primitive = True
+	if pow(g, p-1, p) == 1:
+		for i in range(1, p):
+			if pow(g, i, p-1) == 1:
+				primitive = False
+				break
+	else:
+		primitive = False
+	return primitive
+
+
 if __name__ == '__main__':
-	# Выбираем 2 числа p и g:
-	p = 113
-	g = 31
-	c, d = keygen(p, g)
-	table(c, d)
+	# Кодируемое сообщение должно быть целым числом:
+	while True:
+		m = input('Your message for encryption: ')
+		try:
+			m = int(m)
+		except ValueError as e:
+			print('Your message must be integer. Try again!')
+		else:
+			break
+	# Генерируем 2 числа p и g:
+	p, g = gen_pg(m)
+	# Вычисляем закрытый и открытый ключи:
+	x, y = keygen(p, g)
 
-	m = 54  # открытый текст, m < p
-	B = 1   # номер абонента, которому хотим передать сообщение
+	r, e = encryption(p, g, m, y)
+	print(f'Ciphertext (r, e) = ({r}, {e})')
 
-	r, e = encryption(p, g, m, d[B])
-	print('(r, e) = ', r, e)
+	mm = decryption(r, e, p, x)
+	print(f'Found message = {mm}')
 
-	mm = decryption(r, e, p, c[B])
-	print('Message = ', mm)
