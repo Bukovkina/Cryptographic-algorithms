@@ -23,6 +23,7 @@ def encryption(p, g, m, y):
 
 def decryption(r, e, p, x):
 	m = e * pow(r, (p-1-x), p) % p
+	m = ''.join([chr(i) for i in m])
 	return m
 
 
@@ -53,17 +54,10 @@ def is_primitive_root(g, p):
 
 
 if __name__ == '__main__':
-	# Кодируемое сообщение должно быть целым числом:
-	while True:
-		m = input('Your message for encryption: ')
-		try:
-			m = int(m)
-		except ValueError as e:
-			print('Your message must be integer. Try again!')
-		else:
-			break
+	m = input('Your message for encryption: ')
+	m = np.array([ord(c) for c in m])
 	# Генерируем 2 числа p и g:
-	p, g = gen_pg(m)
+	p, g = gen_pg(max(m))
 	# Вычисляем закрытый и открытый ключи:
 	x, y = keygen(p, g)
 
