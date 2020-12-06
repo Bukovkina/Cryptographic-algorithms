@@ -12,17 +12,18 @@ def keygen(p, g):
 
 
 def encryption(p, g, m, y):
-	# Генерируем случайное число k, 1 < k < p-1:
-	k = random.randint(2, p-2)
+	# Для каждого блока текста генерируем 
+	# случайное число k, 1 < k < p-1:
+	k = [random.randint(2, p-2) for _ in m]
 	print(f'k = {k}')
-	# Вычисляем пару (r, e):
-	r = pow(g, k, p)
-	e = m * pow(int(y), k, p) % p
+	# Вычисляем пару векторов(r, e):
+	r = [pow(g, int(ki), p) for ki in k]
+	e = [mi * pow(int(y), int(ki), p) % p for mi, ki in zip(m, k)]
 	return r, e
 
 
 def decryption(r, e, p, x):
-	m = e * pow(r, (p-1-x), p) % p
+	m = [ei * pow(int(ri), (p-1-x), p) % p for ei, ri in zip(e, r)]
 	m = ''.join([chr(i) for i in m])
 	return m
 
@@ -55,15 +56,15 @@ def is_primitive_root(g, p):
 
 if __name__ == '__main__':
 	m = input('Your message for encryption: ')
-	m = np.array([ord(c) for c in m])
+	m = [ord(c) for c in m]
 	# Генерируем 2 числа p и g:
 	p, g = gen_pg(max(m))
 	# Вычисляем закрытый и открытый ключи:
 	x, y = keygen(p, g)
 
 	r, e = encryption(p, g, m, y)
-	print(f'Ciphertext (r, e) = ({r}, {e})')
+	print('Ciphertext (r, e) = ' + ', '.join('({}, {})'.format(ri, ei) for ri, ei in zip(r, e)))
 
 	mm = decryption(r, e, p, x)
-	print(f'Found message = {mm}')
+	print(f'Found message: {mm}')
 
